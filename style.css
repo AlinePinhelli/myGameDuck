@@ -1,0 +1,312 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background: linear-gradient(to bottom, #87CEEB 0%, #98FB98 50%, #1a6b1a 100%);
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.game-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+h1 {
+  color: #212a8d;
+  font-size: 2.5rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  margin-bottom: 10px;
+}
+
+.game-info {
+  color: #ffffff;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(11, 6, 108, 0.2);
+  padding: 10px 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.add-btn {
+  background: #4ECDC4;
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: white;
+  margin: 15% auto;
+  padding: 20px;
+  border-radius: 15px;
+  width: 80%;
+  max-width: 500px;
+  text-align: center;
+}
+
+.modal-content h3 {
+  margin-bottom: 20px;
+  color: #2E8B57;
+}
+
+#playerName {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+.color-selection label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.color-options {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.color-option {
+  font-size: 30px;
+  padding: 10px;
+  border: 3px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.color-option:hover,
+.color-option.selected {
+  border-color: #4ECDC4;
+  background: rgba(78, 205, 196, 0.2);
+  transform: scale(1.1);
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.modal-buttons button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#confirmPlayer {
+  background: #4ECDC4;
+  color: white;
+}
+
+#cancelPlayer {
+  background: #FF6B6B;
+  color: white;
+}
+
+/* Rio e raias */
+.river-container {
+  margin: 20px 0;
+}
+
+.river {
+  position: relative;
+  height: 600px;
+  background: linear-gradient(to bottom, #4682B4, #1E90FF, #00BFFF);
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.water-animation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.2) 2px, transparent 2px),
+    radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.15) 1px, transparent 1px);
+  animation: waterFlow 6s ease-in-out infinite;
+}
+
+@keyframes waterFlow {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(-10px); }
+}
+
+.lanes-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+}
+
+.player-lane {
+  flex: 1;
+  border-bottom: 2px dashed rgba(255, 255, 255, 0.3);
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.player-lane:last-child {
+  border-bottom: none;
+}
+
+.duck-player {
+  position: absolute;
+  left: 20px;
+  font-size: 40px;
+  transition: left 0.5s ease;
+  z-index: 3;
+}
+
+.player-info {
+  position: absolute;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-weight: bold;
+  color: #2E8B57;
+}
+
+.player-name {
+  font-size: 14px;
+}
+
+.player-score {
+  font-size: 18px;
+  color: #FF6B6B;
+}
+
+.duck-dead {
+  filter: grayscale(100%);
+  opacity: 0.5;
+  animation: sinking 2s ease-out forwards;
+}
+
+@keyframes sinking {
+  to {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+}
+
+/* Painel de pontuação */
+.scoring-panel {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 20px;
+  border-radius: 15px;
+  margin-top: 20px;
+}
+
+.scoring-panel h3 {
+  text-align: center;
+  color: #2E8B57;
+  margin-bottom: 20px;
+}
+
+.scoring-inputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.score-input-group {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.score-input-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #2E8B57;
+}
+
+.score-input-group input {
+  width: 80px;
+  padding: 8px;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  text-align: center;
+  font-size: 16px;
+}
+
+.scoring-buttons {
+  text-align: center;
+}
+
+.scoring-buttons button {
+  background:linear-gradient(45deg, #56e9db, #b2e4e3);
+  border: none;
+  color: white;
+  padding: 12px 24px;
+  margin: 0 10px;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.scoring-buttons button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+#resetGame {
+  background: linear-gradient(45deg, #FF6B6B, #FF8E53);
+}
+
+.hidden {
+  display: none;
+}
