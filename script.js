@@ -15,9 +15,16 @@ class PatoPontinhoScoring {
     this.applyScoresBtn = document.getElementById('applyScores');
     this.resetBtn = document.getElementById('resetGame');
     this.activeCountSpan = document.getElementById('activeCount');
+    this.toggleMusicBtn = document.getElementById('toggleMusic');
     
     this.selectedColor = null;
     this.usedColors = new Set();
+    
+    // Audio
+    this.audioContext = null;
+    this.backgroundMusic = null;
+    this.isMusicPlaying = false;
+    this.musicEnabled = true;
     
     this.init();
   }
@@ -29,6 +36,11 @@ class PatoPontinhoScoring {
     this.applyScoresBtn.addEventListener('click', () => this.applyScores());
     this.resetBtn.addEventListener('click', () => this.resetGame());
     
+    // Verificar se o botão de música existe antes de adicionar o listener
+    if (this.toggleMusicBtn) {
+      this.toggleMusicBtn.addEventListener('click', () => this.toggleMusic());
+    }
+    
     this.colorOptions.forEach(option => {
       option.addEventListener('click', () => this.selectColor(option));
     });
@@ -37,7 +49,232 @@ class PatoPontinhoScoring {
       if (e.target === this.modal) this.closeModal();
     });
     
+    // Atualizar layout quando a tela mudar de orientação
+    window.addEventListener('resize', () => {
+      setTimeout(() => this.updatePlayerLanes(), 100);
+    });
+    
+    // Inicializar áudio quando usuário interagir pela primeira vez
+    document.addEventListener('click', () => this.initAudio(), { once: true });
+    
     this.updateUI();
+  }
+  
+  async initAudio() {
+    if (this.audioContext) return; // Evitar inicializar múltiplas vezes
+    
+    try {
+      console.log('Inicializando áudio...');
+      this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      console.log('AudioContext criado:', this.audioContext.state);
+      
+      // Garantir que o contexto está ativo
+      if (this.audioContext.state === 'suspended') {
+        await this.audioContext.resume();
+      }
+      
+      if (this.musicEnabled) {
+        this.startBackgroundMusic();
+      }
+    } catch (error) {
+      console.log('Áudio não suportado:', error);
+    }
+  }
+  
+  async startBackgroundMusic() {
+    if (!this.audioContext || this.isMusicPlaying || !this.musicEnabled) return;
+    
+    try {
+      // Criar música de fundo alegre usando osciladores
+      const melody = [
+        { freq: 523, duration: 0.3 }, // C
+        { freq: 587, duration: 0.3 }, // D
+        { freq: 659, duration: 0.3 }, // E
+        { freq: 698, duration: 0.3 }, // F
+        { freq: 784, duration: 0.6 }, // G
+        { freq: 659, duration: 0.3 }, // E
+        { freq: 523, duration: 0.6 }, // C
+      ];
+      
+      this.isMusicPlaying = true;
+      this.playMelody(melody, 0);
+      
+    } catch (error) {
+      console.log('Erro ao iniciar música:', error);
+    }
+  }
+  
+  playMelody(melody, index) {
+    if (!this.audioContext || !this.isMusicPlaying || !this.musicEnabled) return;
+    
+    if (index >= melody.length) {
+      // Reiniciar a melodia após uma pausa
+      setTimeout(() => {
+        if (this.isMusicPlaying && this.musicEnabled) {
+          this.playMelody(melody, 0);
+        }
+      }, 1000);
+      return;
+    }
+    
+    const note = melody[index];
+    const oscillator = this.audioContext.createOscillator();
+    const gainNode = this.audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(this.audioContext.destination);
+    
+    oscillator.frequency.value = note.freq;
+    oscillator.type = 'sine';
+    
+    gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+    gainNode.gain.linearRampToValueAtTime(0.1, this.audioContext.currentTime + 0.01);
+    gainNode.gain.linearRampToValueAtTime(0, this.audioContext.currentTime + note.duration);
+    
+    oscillator.start(this.audioContext.currentTime);
+    oscillator.stop(this.audioContext.currentTime + note.duration);
+    
+    // Próxima nota
+    setTimeout(() => {
+      this.playMelody(melody, index + 1);
+    }, note.duration * 1000);
+  }
+  
+  stopBackgroundMusic() {
+    this.isMusicPlaying = false;
+  }
+  
+  toggleMusic() {
+    this.musicEnabled = !this.musicEnabled;
+    
+    if (this.toggleMusicBtn) {
+      this.toggleMusicBtn.textContent = this.musicEnabled ? '🎵 Música: ON' : '🎵 Música: OFF';
+    }
+    
+    if (this.musicEnabled) {
+      if (!this.audioContext) {
+        this.initAudio();
+      } else {
+        this.startBackgroundMusic();
+      }
+    } else {
+      this.stopBackgroundMusic();
+    }
+    
+    console.log('Música:', this.musicEnabled ? 'Ligada' : 'Desligada');
+  }
+  
+  playQuackSound() {
+    console.log('🦆 Tentando tocar QUACK');
+    
+    // Método 1: Tentar com audioContext existente
+    if (this.audioContext && this.audioContext.state === 'running') {
+      this.playQuackWithAudioContext();
+      return;
+    }
+    
+    // Método 2: Criar novo audioContext na hora
+    try {
+      const tempAudioContext = new (window.AudioContext || window.webkitAudioContext)();
+      
+      if (tempAudioContext.state === 'suspended') {
+        tempAudioContext.resume().then(() => {
+          this.playQuackWithContext(tempAudioContext);
+        });
+      } else {
+        this.playQuackWithContext(tempAudioContext);
+      }
+    } catch (error) {
+      console.log('❌ Erro ao criar AudioContext temporário:', error);
+      // Método 3: Fallback com beep simples
+      this.playBeepFallback();
+    }
+  }
+  
+  playQuackWithAudioContext() {
+    try {
+      console.log('🦆 Tocando com AudioContext existente');
+      
+      const oscillator = this.audioContext.createOscillator();
+      const gainNode = this.audioContext.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(this.audioContext.destination);
+      
+      oscillator.frequency.setValueAtTime(200, this.audioContext.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(100, this.audioContext.currentTime + 0.4);
+      oscillator.type = 'sawtooth';
+      
+      gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.9, this.audioContext.currentTime + 0.01);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.4);
+      
+      oscillator.start(this.audioContext.currentTime);
+      oscillator.stop(this.audioContext.currentTime + 0.4);
+      
+      console.log('✅ Quack tocado!');
+    } catch (error) {
+      console.log('❌ Erro no quack:', error);
+    }
+  }
+  
+  playQuackWithContext(context) {
+    try {
+      console.log('🦆 Tocando com AudioContext temporário');
+      
+      const oscillator = context.createOscillator();
+      const gainNode = context.createGain();
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(context.destination);
+      
+      oscillator.frequency.setValueAtTime(200, context.currentTime);
+      oscillator.frequency.exponentialRampToValueAtTime(100, context.currentTime + 0.4);
+      oscillator.type = 'sawtooth';
+      
+      gainNode.gain.setValueAtTime(0, context.currentTime);
+      gainNode.gain.linearRampToValueAtTime(0.9, context.currentTime + 0.01);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.4);
+      
+      oscillator.start(context.currentTime);
+      oscillator.stop(context.currentTime + 0.4);
+      
+      console.log('✅ Quack temporário tocado!');
+      
+      // Fechar o contexto depois do som
+      setTimeout(() => {
+        context.close();
+      }, 500);
+      
+    } catch (error) {
+      console.log('❌ Erro no quack temporário:', error);
+    }
+  }
+  
+  playBeepFallback() {
+    console.log('🔊 Usando fallback - beep simples');
+    
+    // Como último recurso, tentar com AudioContext bem básico
+    try {
+      const ctx = new AudioContext();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      
+      osc.frequency.value = 440; // Nota A
+      gain.gain.value = 0.5;
+      
+      osc.start();
+      osc.stop(ctx.currentTime + 0.3);
+      
+      setTimeout(() => ctx.close(), 400);
+      
+      console.log('✅ Beep fallback tocado!');
+    } catch (error) {
+      console.log('❌ Nem o fallback funcionou:', error);
+    }
   }
   
   openModal() {
@@ -146,9 +383,23 @@ class PatoPontinhoScoring {
       duck.className = `duck-player ${player.isDead ? 'duck-dead' : ''}`;
       duck.textContent = player.emoji;
       
-      // Posição do pato baseada na pontuação (0-100)
-      const position = Math.min((player.score / this.winningScore) * 80, 80);
-      duck.style.left = `${1 + position}%`;
+      // Verificar se é mobile
+      const isMobile = window.innerWidth <= 768;
+      
+      if (isMobile) {
+        // Movimento vertical (topo para baixo)
+        const maxHeight = this.lanesContainer.offsetHeight - 100; // Espaço para info
+        const position = Math.min((player.score / this.winningScore) * maxHeight, maxHeight);
+        duck.style.top = `${20 + position}px`;
+        duck.style.left = '50%';
+        duck.style.transform = 'translateX(-50%)';
+      } else {
+        // Movimento horizontal (esquerda para direita)
+        const position = Math.min((player.score / this.winningScore) * 80, 80);
+        duck.style.left = `${5 + position}%`;
+        duck.style.top = 'auto';
+        duck.style.transform = 'none';
+      }
       
       const info = document.createElement('div');
       info.className = 'player-info';
@@ -205,7 +456,14 @@ class PatoPontinhoScoring {
           player.score += scoreToAdd;
           
           if (player.score >= this.winningScore) {
+            console.log(`🎯 ${player.name} atingiu ${player.score} pontos - ELIMINADO!`);
             player.isDead = true;
+            
+            // Tocar o som de eliminação
+            console.log('🔊 Chamando playQuackSound...');
+            this.playQuackSound();
+            
+            // Mensagem depois de um delay
             this.showDeathMessage(player);
           }
           
@@ -224,9 +482,10 @@ class PatoPontinhoScoring {
   }
   
   showDeathMessage(player) {
+    // Aguardar um pouco para o som tocar antes da mensagem
     setTimeout(() => {
       alert(`💀 ${player.name} chegou a ${player.score} pontos e foi eliminado! 💀`);
-    }, 500);
+    }, 800); // Aumentei de 500ms para 800ms para dar tempo do quack tocar
   }
   
   checkGameEnd() {
@@ -234,10 +493,12 @@ class PatoPontinhoScoring {
     
     if (alivePlayers.length === 1) {
       setTimeout(() => {
+        this.stopBackgroundMusic();
         alert(`🎉 ${alivePlayers[0].name} é o vencedor! 🏆`);
       }, 1000);
     } else if (alivePlayers.length === 0) {
       setTimeout(() => {
+        this.stopBackgroundMusic();
         alert('😱 Todos os jogadores foram eliminados!');
       }, 1000);
     }
@@ -247,6 +508,12 @@ class PatoPontinhoScoring {
     if (this.players.length > 0 && confirm('Tem certeza que deseja reiniciar o jogo?')) {
       this.players = [];
       this.usedColors.clear();
+      this.stopBackgroundMusic();
+      setTimeout(() => {
+        if (this.musicEnabled && this.audioContext) {
+          this.startBackgroundMusic();
+        }
+      }, 500);
       this.updateUI();
     }
   }

@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pato Pontinho - Marcador de Pontuação</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🦆</text></svg>">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,11 +13,14 @@
       <h1>🦆 Pato Pontinho - Marcador 🦆</h1>
       <div class="game-info">
         <span>Jogadores ativos: <span id="activeCount">0</span>/10</span>
-        <button id="addPlayer" class="add-btn">+ Adicionar Jogador</button>
+        <div class="header-buttons">
+          <button id="toggleMusic" class="music-btn">🎵 Música: ON</button>
+          <button id="addPlayer" class="add-btn">+ Adicionar Jogador</button>
+        </div>
       </div>
     </header>
 
-    <!-- Modal para adicionar jogador -->
+
     <div id="playerModal" class="modal">
       <div class="modal-content">
         <h3>Adicionar Novo Jogador</h3>
@@ -28,7 +32,6 @@
             <div class="color-option" data-color="white">🐥</div>
             <div class="color-option" data-color="brown">🦢</div>
             <div class="color-option" data-color="black">🐧</div>
-            <div class="color-option" data-color="green">🦜</div>
             <div class="color-option" data-color="blue">🐦</div>
             <div class="color-option" data-color="red">🐓</div>
             <div class="color-option" data-color="purple">🦚</div>
@@ -45,16 +48,16 @@
       <div class="river">
         <div class="water-animation"></div>
         <div class="lanes-container" id="lanesContainer">
-          <!-- As raias dos jogadores serão geradas aqui -->
+         
         </div>
       </div>
     </div>
 
-    <!-- Painel de pontuação -->
+ 
     <div class="scoring-panel">
       <h3>Adicionar Pontos da Rodada</h3>
       <div id="scoringInputs" class="scoring-inputs">
-        <!-- Inputs de pontuação serão gerados aqui -->
+       
       </div>
       <div class="scoring-buttons">
         <button id="applyScores">Aplicar Pontuação</button>

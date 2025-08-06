@@ -45,6 +45,12 @@ h1 {
   margin-bottom: 20px;
 }
 
+.header-buttons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
 .add-btn {
   background: #4ECDC4;
   border: none;
@@ -53,6 +59,21 @@ h1 {
   border-radius: 15px;
   cursor: pointer;
   font-weight: bold;
+}
+
+.music-btn {
+  background: #9B59B6;
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.music-btn:hover {
+  background: #8E44AD;
 }
 
 /* Modal */
@@ -199,7 +220,7 @@ h1 {
 
 .duck-player {
   position: absolute;
-  left: 20px;
+  left: 10px;
   font-size: 40px;
   transition: left 0.5s ease;
   z-index: 3;
@@ -309,4 +330,148 @@ h1 {
 
 .hidden {
   display: none;
+}
+
+/* RESPONSIVO PARA CELULAR - MOVIMENTO VERTICAL */
+@media (max-width: 768px) {
+  .river {
+    height: 80vh; /* Altura maior para movimento vertical */
+    min-height: 500px;
+  }
+  
+  .lanes-container {
+    flex-direction: row; /* Raias lado a lado */
+  }
+  
+  .player-lane {
+    flex: 1;
+    border-bottom: none;
+    border-right: 2px dashed rgba(255, 255, 255, 0.3);
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 0px 10px;
+  }
+  
+  .player-lane:last-child {
+    border-right: none;
+  }
+  
+  .duck-player {
+    position: absolute;
+    top: 20px; /* Começa no topo */
+    left: 50%;
+    transform: translateX(-50%);
+    transition: top 0.5s ease; /* Movimento vertical */
+    font-size: 35px;
+  }
+  
+  .player-info {
+    position: absolute;
+    bottom: 10px; /* Info na parte inferior */
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 3px 8px;
+    font-size: 12px;
+    text-align: center;
+    min-width: 60px;
+  }
+  
+  .player-name {
+    font-size: 10px;
+    line-height: 1.2;
+  }
+  
+  .player-score {
+    font-size: 14px;
+  }
+  
+  /* Ajustar animação da água para movimento vertical */
+  @keyframes waterFlow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  /* Ajustar painel de pontuação para celular */
+  .scoring-inputs {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+  }
+  
+  .score-input-group {
+    padding: 10px;
+  }
+  
+  .score-input-group label {
+    font-size: 12px;
+    margin-bottom: 5px;
+  }
+  
+  .score-input-group input {
+    width: 60px;
+    font-size: 14px;
+  }
+  
+  /* Ajustar botões para celular */
+  .scoring-buttons button {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    margin: 5px;
+  }
+  
+  /* Ajustar modal para celular */
+  .modal-content {
+    width: 95%;
+    margin: 10% auto;
+    padding: 15px;
+  }
+  
+  .color-options {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  
+  .color-option {
+    font-size: 25px;
+    padding: 8px;
+  }
+}
+
+/* Para telas muito pequenas */
+@media (max-width: 480px) {
+  .game-container {
+    padding: 10px;
+  }
+  
+  h1 {
+    font-size: 1.8rem;
+  }
+  
+  .game-info {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+  
+  .header-buttons {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .music-btn {
+    font-size: 12px;
+    padding: 6px 12px;
+  }
+  
+  .river {
+    height: 70vh;
+  }
+  
+  .duck-player {
+    font-size: 30px;
+  }
+  
+  .scoring-inputs {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
